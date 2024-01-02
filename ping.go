@@ -12,9 +12,9 @@ type Ping struct {
 	timeout int
 	maxLoss float64
 
-	online bool
+	Online bool
 
-	log *zap.SugaredLogger
+	Log *zap.SugaredLogger
 }
 
 func NewPing(log *zap.SugaredLogger) *Ping {
@@ -28,15 +28,15 @@ func NewPing(log *zap.SugaredLogger) *Ping {
 		count:   cfg.Count,
 		timeout: cfg.Timeout,
 		maxLoss: cfg.MaxLoss,
-		online:  false,
-		log:     log,
+		Online:  false,
+		Log:     log,
 	}
 }
 
 func (p *Ping) newPinger() *ping.Pinger {
 	pinger, err := ping.NewPinger(p.ip)
 	if err != nil {
-		p.log.Errorf("Failed to create pinger: %v", err)
+		p.Log.Errorf("Failed to create pinger: %v", err)
 	}
 
 	pinger.SetPrivileged(true) // Must be set for Windows
@@ -45,31 +45,31 @@ func (p *Ping) newPinger() *ping.Pinger {
 	return pinger
 }
 
-func (p *Ping) checkOnline() bool {
+func (p *Ping) CheckOnline() bool {
 	pinger := p.newPinger()
 
 	if err := pinger.Run(); err != nil {
-		p.log.Errorf("Failed to run pinger: %v", err)
+		p.Log.Errorf("Failed to run pinger: %v", err)
 		return false
 	}
 
-	p.log.Infof("sent: %v, recv: %v, loss: %v", pinger.PacketsSent, pinger.PacketsRecv, pinger.Statistics().PacketLoss)
+	p.Log.Infof("sent: %v, recv: %v, loss: %v", pinger.PacketsSent, pinger.PacketsRecv, pinger.Statistics().PacketLoss)
 	return pinger.Statistics().PacketLoss < p.maxLoss
 }
 
-func (p *Ping) Run(interval int, ch chan bool) {
-	p.online = p.checkOnline()
-	ch <- p.online
-
-	ticker := time.NewTicker(time.Duration(interval) * time.Second)
-	defer ticker.Stop()
-
-	for range ticker.C {
-		curStatus := p.checkOnline()
-		p.log.Infof("ping %s, online %v", p.ip, curStatus)
-		if curStatus != p.online {
-			p.online = curStatus
-			ch <- p.online
-		}
-	}
-}
+//func (p *Ping) Run(interval int, ch chan bool) {
+//	p.online = p.checkOnline()
+//	ch <- p.online
+//
+//	ticker := time.NewTicker(time.Duration(interval) * time.Second)
+//	defer ticker.Stop()
+//
+//	for range ticker.C {
+//		curStatus := p.checkOnline()
+//		p.log.Infof("ping %s, online %v", p.ip, curStatus)
+//		if curStatus != p.online {
+//			p.online = curStatus
+//			ch <- p.online
+//		}
+//	}
+//}
