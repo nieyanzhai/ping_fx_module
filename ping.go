@@ -17,13 +17,19 @@ type Ping struct {
 	log *zap.SugaredLogger
 }
 
-func NewPing(ip string, count, timeout int, maxLoss float64) *Ping {
+func NewPing(log *zap.SugaredLogger) *Ping {
+	cfg, err := loadConfig(cfgPath)
+	if err != nil {
+		panic(err)
+	}
+
 	return &Ping{
-		ip:      ip,
-		count:   count,
-		timeout: timeout,
-		maxLoss: maxLoss,
+		ip:      cfg.IP,
+		count:   cfg.Count,
+		timeout: cfg.Timeout,
+		maxLoss: cfg.MaxLoss,
 		online:  false,
+		log:     log,
 	}
 }
 
