@@ -1,4 +1,4 @@
-module ping_fx_module
+module github.com/nieyanzhai/ping_fx_module
 
 go 1.21
 
