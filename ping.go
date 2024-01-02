@@ -7,7 +7,7 @@ import (
 )
 
 type Ping struct {
-	ip      string
+	IP      string
 	count   int
 	timeout int
 	maxLoss float64
@@ -24,7 +24,7 @@ func NewPing(log *zap.SugaredLogger) *Ping {
 	}
 
 	return &Ping{
-		ip:      cfg.IP,
+		IP:      cfg.IP,
 		count:   cfg.Count,
 		timeout: cfg.Timeout,
 		maxLoss: cfg.MaxLoss,
@@ -34,7 +34,7 @@ func NewPing(log *zap.SugaredLogger) *Ping {
 }
 
 func (p *Ping) newPinger() *ping.Pinger {
-	pinger, err := ping.NewPinger(p.ip)
+	pinger, err := ping.NewPinger(p.IP)
 	if err != nil {
 		p.Log.Errorf("Failed to create pinger: %v", err)
 	}
